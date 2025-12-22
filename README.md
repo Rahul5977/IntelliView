@@ -8,39 +8,373 @@ IntelliView is a full-stack, AI-powered platform designed to help users prepare 
 
 ## 🚀 Core Features
 
-* **Dynamic Question Generation:** The AI (using RAG) generates a unique set of interview questions based on the user's **uploaded resume/CV**, the target **job role**, and the **company** they are applying to.
+- **Dynamic Question Generation:** The AI (using RAG) generates a unique set of interview questions based on the user's **uploaded resume/CV**, the target **job role**, and the **company** they are applying to.
 
-* **Company-Specific RAG:** The platform is pre-loaded with a vector database of "Previous Year Questions" (PYQs) for major companies. The AI retrieves and incorporates these specific questions into the interview.
+- **Company-Specific RAG:** The platform is pre-loaded with a vector database of "Previous Year Questions" (PYQs) for major companies. The AI retrieves and incorporates these specific questions into the interview.
 
-* **Realistic Video Interview:** A sleek, timed, and interactive UI that presents questions one by one and records the user's video and audio answers, simulating a real remote interview.
+- **Realistic Video Interview:** A sleek, timed, and interactive UI that presents questions one by one and records the user's video and audio answers, simulating a real remote interview.
 
-* **Real-time Proctoring & Anti-Cheating:**
-    * **Gaze Detection:** Flags when the user is consistently looking away from the screen.
-    * **Multi-Face Detection:** Detects if more than one person is in the frame.
-    * **Object Detection:** Identifies forbidden objects like a mobile phone.
-    * **Real-time Alerts:** Provides a "proctoring report" at the end, highlighting potential violations.
+- **Real-time Proctoring & Anti-Cheating:**
 
-* **Instant Post-Interview Analysis:**
-    * **Speech-to-Text:** Transcribes all spoken answers.
-    * **AI-Powered Feedback:** The Generative AI analyzes the *content* of the transcript, providing a score and constructive feedback for each answer.
-    * **Detailed Report Card:** A final report gives an overall score, a breakdown by question, and a summary of all proctoring flags.
+  - **Gaze Detection:** Flags when the user is consistently looking away from the screen.
+  - **Multi-Face Detection:** Detects if more than one person is in the frame.
+  - **Object Detection:** Identifies forbidden objects like a mobile phone.
+  - **Real-time Alerts:** Provides a "proctoring report" at the end, highlighting potential violations.
+
+- **Instant Post-Interview Analysis:**
+  - **Speech-to-Text:** Transcribes all spoken answers.
+  - **AI-Powered Feedback:** The Generative AI analyzes the _content_ of the transcript, providing a score and constructive feedback for each answer.
+  - **Detailed Report Card:** A final report gives an overall score, a breakdown by question, and a summary of all proctoring flags.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Backend:** **Python (FastAPI)**
-    * Handles all API logic, user authentication, and file storage.
-    * Manages WebSocket connections for real-time proctoring.
-    * Runs background tasks for heavy AI analysis.
+- **Backend:** **Python (FastAPI)**
 
-* **Frontend:** **React.js**
-    * Manages all UI, state, and user interaction.
-    * Captures video/audio using the `MediaRecorder` API.
-    * Streams video frames over WebSockets for proctoring.
+  - Handles all API logic, user authentication, and file storage.
+  - Manages WebSocket connections for real-time proctoring.
+  - Runs background tasks for heavy AI analysis.
 
-* **Generative AI & ML:**
-    * **GenAI (e.g., OpenAI/Gemini):** For question generation and answer evaluation.
-    * **Speech-to-Text (e.g., Whisper):** For transcribing audio from video answers.
-    * **Computer Vision (e.g., OpenCV, MediaPipe):** For all real-time proctoring tasks.
-    * **Vector Database (e.g., Chroma, Pinecone):** For storing and retrieving company-specific PYQs.
+- **Frontend:** **React.js**
+
+  - Manages all UI, state, and user interaction.
+  - Captures video/audio using the `MediaRecorder` API.
+  - Streams video frames over WebSockets for proctoring.
+
+- **Generative AI & ML:**
+  - **GenAI (e.g., OpenAI/Gemini):** For question generation and answer evaluation.
+  - **Speech-to-Text (e.g., Whisper):** For transcribing audio from video answers.
+  - **Computer Vision (e.g., OpenCV, MediaPipe):** For all real-time proctoring tasks.
+  - **Vector Database (e.g., Chroma, Pinecone):** For storing and retrieving company-specific PYQs.
+
+---
+
+## 📦 Project Structure
+
+```
+IntelliView/
+├── frontend/          # React + TypeScript + Vite + TailwindCSS
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── server/            # Node.js + Express + TypeScript + Prisma
+│   ├── src/
+│   │   ├── config/        # Database & AWS S3 config
+│   │   ├── controllers/   # Route controllers
+│   │   ├── routes/        # API routes
+│   │   ├── services/      # Business logic
+│   │   ├── utils/         # Helper functions
+│   │   ├── app.ts         # Express app setup
+│   │   └── server.ts      # Server entry point
+│   ├── prisma/
+│   │   ├── schema.prisma  # Database schema
+│   │   └── migrations/    # Database migrations
+│   ├── docker-compose.yml # PostgreSQL container
+│   └── package.json
+│
+├── plan.md            # Project roadmap
+└── README.md          # This file
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** 18+ and npm/yarn
+- **Docker Desktop** (for PostgreSQL)
+- **Git**
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/intelliview.git
+cd IntelliView
+```
+
+### 2. Server Setup
+
+```bash
+# Navigate to server directory
+cd server
+
+# Install dependencies
+npm install
+
+# Create .env file (see Environment Variables section below)
+cp .env.example .env
+# Edit .env with your actual credentials
+
+# Start PostgreSQL database
+docker-compose up -d
+
+# Run database migrations
+npx prisma migrate dev
+
+# Generate Prisma client
+npx prisma generate
+
+# Open Prisma Studio (optional - database GUI)
+npx prisma studio
+```
+
+#### Server Environment Variables
+
+Create `server/.env`:
+
+```env
+# Database
+DATABASE_URL="postgresql://postgres:password@localhost:5432/intelliview?schema=public"
+
+# JWT Secrets (Change these in production!)
+JWT_SECRET="your-super-secret-jwt-key-change-in-production"
+JWT_REFRESH_SECRET="your-refresh-token-secret-change-in-production"
+
+# Google OAuth (Get from Google Cloud Console)
+GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+GOOGLE_CALLBACK_URL="http://localhost:8000/api/auth/google/callback"
+
+# AWS S3 (Get from AWS Console)
+AWS_REGION="us-east-1"
+AWS_ACCESS_KEY_ID="your-aws-access-key"
+AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
+AWS_S3_BUCKET="intelliview-uploads"
+
+# Frontend URL
+FRONTEND_URL="http://localhost:5173"
+
+# Server
+NODE_ENV="development"
+PORT=8000
+```
+
+### 3. Frontend Setup
+
+```bash
+# Navigate to frontend directory
+cd ../frontend
+
+# Install dependencies
+npm install
+
+# Create .env file
+echo "VITE_API_URL=http://localhost:8000" > .env
+
+# Start development server
+npm run dev
+```
+
+### 4. Start Development
+
+**Terminal 1 - Server:**
+
+```bash
+cd server
+npm run dev
+```
+
+**Terminal 2 - Frontend:**
+
+```bash
+cd frontend
+npm run dev
+```
+
+**Access the application:**
+
+- Frontend: http://localhost:5173
+- Server API: http://localhost:8000
+- Prisma Studio: http://localhost:51212 (if running)
+
+---
+
+## 📊 Database Schema
+
+The application uses PostgreSQL with Prisma ORM. Key models include:
+
+- **User** - User accounts with Google OAuth
+- **Resume** - Uploaded resumes with parsed data
+- **Company** - Company profiles
+- **Interview** - Interview sessions
+- **InterviewSession** - Q&A pairs within interviews
+- **Question** - Question bank
+- **ProctoringLog** - Proctoring violation logs
+- **InterviewExperience** - Community-submitted experiences
+- **PastQuestion** - Company-specific previous questions
+
+To view/edit the database visually:
+
+```bash
+cd server
+npx prisma studio
+```
+
+---
+
+## 🐳 Docker Commands
+
+```bash
+# Start PostgreSQL
+cd server
+docker-compose up -d
+
+# Stop PostgreSQL
+docker-compose down
+
+# View logs
+docker-compose logs -f postgres
+
+# Stop and remove all data
+docker-compose down -v
+```
+
+---
+
+## 🔧 Useful Commands
+
+### Server
+
+```bash
+cd server
+
+# Development
+npm run dev              # Start with hot reload
+npm run build           # Build for production
+npm start               # Run production build
+
+# Database
+npx prisma generate     # Generate Prisma client
+npx prisma migrate dev  # Create & apply migration
+npx prisma studio       # Open database GUI
+npx prisma format       # Format schema file
+
+# Docker
+docker-compose up -d    # Start PostgreSQL
+docker-compose down     # Stop PostgreSQL
+```
+
+### Frontend
+
+```bash
+cd frontend
+
+npm run dev             # Start dev server
+npm run build          # Build for production
+npm run preview        # Preview production build
+npm run lint           # Run ESLint
+```
+
+---
+
+## 🎯 Current Development Status
+
+### ✅ Completed (Phase 1)
+
+- [x] Project structure setup
+- [x] PostgreSQL database with Docker
+- [x] Prisma ORM configuration
+- [x] Complete database schema design
+- [x] Basic Express server setup
+- [x] Frontend scaffolding with Vite + React + TypeScript
+- [x] TailwindCSS configuration
+
+### 🚧 In Progress (Phase 2)
+
+- [ ] Google OAuth authentication
+- [ ] Resume file upload with AWS S3
+- [ ] JWT token management
+- [ ] User profile management
+
+### 📋 Planned (Phase 3+)
+
+- [ ] AI question generation with OpenAI
+- [ ] Resume parsing and skill extraction
+- [ ] Interview session management
+- [ ] Real-time proctoring with WebRTC
+- [ ] Speech-to-text integration
+- [ ] Answer evaluation with AI
+- [ ] Community features (PYQs, experiences)
+
+---
+
+## 🤝 Contributing
+
+See [CONTRIBUTOR.md](CONTRIBUTOR.md) for contribution guidelines.
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🐛 Troubleshooting
+
+### Database Connection Issues
+
+```bash
+# Check if Docker is running
+docker ps
+
+# Restart PostgreSQL
+cd server
+docker-compose restart
+
+# Check logs
+docker-compose logs postgres
+```
+
+### Port Already in Use
+
+If you get port conflicts:
+
+**Server (Port 8000):**
+Edit `server/.env`:
+
+```
+PORT=8001
+```
+
+**PostgreSQL (Port 5432):**
+Edit `server/docker-compose.yml`:
+
+```yaml
+ports:
+  - "5433:5432"
+```
+
+Then update `DATABASE_URL` in `server/.env`
+
+**Frontend (Port 5173):**
+
+```bash
+cd frontend
+npm run dev -- --port 5174
+```
+
+### Prisma Issues
+
+```bash
+cd server
+
+# Regenerate client
+npx prisma generate
+
+# Reset database (WARNING: deletes all data!)
+npx prisma migrate reset
+```
+
+---
+
+## 📚 Resources
+
+- [Prisma Documentation](https://www.prisma.io/docs/)
+- [Express.js Documentation](https://expressjs.com/)
+- [React Documentation](https://react.dev/)
+- [TailwindCSS Documentation](https://tailwindcss.com/)
+- [Vite Documentation](https://vitejs.dev/)
