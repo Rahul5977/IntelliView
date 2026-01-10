@@ -6,7 +6,9 @@ import {
 } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import { prisma } from "./database";
-import { log } from "node:console";
+
+// Load environment variables
+dotenv.config();
 
 passport.use(
   new GoogleStrategy(
@@ -22,17 +24,19 @@ passport.use(
       done: VerifyCallback
     ) => {
       try {
-        const email = profile.emails![0].value;
+        const email = profile.emails?.[0]?.value;
         if (!email) {
-          return done("Email not found from google", false);
+          return done(new Error("Email not found from Google"), undefined);
         }
-        //check if user already exists
-        const user = await prisma.user.findUnique({
+
+        // Check if user already exists
+        let user = await prisma.user.findUnique({
           where: { email },
         });
+
         if (!user) {
-          //create new user
-          const newUser = await prisma.user.create({
+          // Create new user
+          user = await prisma.user.create({
             data: {
               email,
               name: profile.displayName || profile.name?.givenName || "User",
@@ -42,29 +46,36 @@ passport.use(
               role: "STUDENT", // Default role
             },
           });
-          console.log(`User create with email ${email} and name ${newUser.name}`,newUser);
-          
-        }else if(!user.googleId){
-          await prisma.user.update({
+          console.log(`✅ New user created: ${email}`);
+        } else if (!user.googleId) {
+          // Link Google account to existing user
+          user = await prisma.user.update({
             where: { email },
             data: {
               googleId: profile.id,
+              picture: user.picture || profile.photos?.[0]?.value,
               isValidated: true,
             },
           });
-          console.log(`User update with email ${email} and name ${user.name}`,user);
-          
+          console.log(`✅ Google account linked: ${email}`);
         }
-        //update last login timestamp
-        await prisma.user.update({
-            where:{id:user?.id},
-            data:{lastLoginAt:new Date()}
+
+        // Update last login timestamp
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() },
         });
+
+        console.log(`✅ User authenticated: ${email} (Role: ${user.role})`);
+
+        // Return the user to passport
+        return done(null, user);
       } catch (error) {
-        console.log("Google Oauth error", error);
-        return done(error as Error, false);
+        console.error("❌ Google OAuth error:", error);
+        return done(error as Error, undefined);
       }
     }
   )
 );
+
 export default passport;
