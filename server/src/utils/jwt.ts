@@ -22,19 +22,19 @@ export const generateRefreshToken = (payload: TokenPayload) => {
 }
 
 //verify access token
-export const verifyAccessToken = (token: string) => {
+export const verifyAccessToken = (token: string): TokenPayload => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined");
   }
-  return jwt.verify(token, process.env.JWT_SECRET);
+  return jwt.verify(token, process.env.JWT_SECRET) as TokenPayload;
 };
 
 //verify refresh token
-export const verifyRefreshToken = (token: string) => {
+export const verifyRefreshToken = (token: string): TokenPayload => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined");
   }
-  return jwt.verify(token, process.env.JWT_SECRET);
+  return jwt.verify(token, process.env.JWT_SECRET) as TokenPayload;
 };
 
 //generate both access and refresh tokens

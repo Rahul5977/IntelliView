@@ -57,7 +57,7 @@ passport.use(
         }
         //update last login timestamp
         await prisma.user.update({
-            where:{id:user.id},
+            where:{id:user?.id},
             data:{lastLoginAt:new Date()}
         });
       } catch (error) {
