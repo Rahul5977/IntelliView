@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import InterviewPrep from "./pages/InterviewPrep";
 
 function App() {
   return (
@@ -13,6 +14,9 @@ function App() {
 
           {/* Direct access to Dashboard (no auth required in bypass mode) */}
           <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Interview Prep Page */}
+          <Route path="/interview-prep" element={<InterviewPrep />} />
 
           {/* Admin Route (no auth required in bypass mode) */}
           <Route

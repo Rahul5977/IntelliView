@@ -192,6 +192,89 @@ npm run dev
 
 ---
 
+## 🛠️ Setup Instructions
+
+### Prerequisites
+
+- Node.js 18+
+- PostgreSQL database
+- Cloudinary account (for file storage)
+- OpenAI API key (for AI features)
+- Pinecone account (for vector database)
+
+### 1. Install Dependencies
+
+```bash
+# Install server dependencies
+cd server
+npm install
+
+# Install frontend dependencies
+cd ../frontend
+npm install
+```
+
+### 2. Environment Setup
+
+Copy `.env.example` to `.env` in the server directory:
+
+```bash
+cd server
+cp .env.example .env
+```
+
+Fill in the required values:
+
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/intelliview
+
+# Cloudinary (for file storage)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# OpenAI (for AI features)
+OPENAI_API_KEY=sk-your-openai-key
+
+# Pinecone (for vector database)
+PINECONE_API_KEY=your-pinecone-key
+```
+
+### 3. Database Setup
+
+```bash
+cd server
+npm run prisma:generate
+npm run prisma:migrate
+```
+
+### 4. Create Pinecone Index
+
+1. Go to [Pinecone Console](https://app.pinecone.io)
+2. Create index: `intelliview-company-questions`
+3. Dimensions: `1536`
+4. Metric: `cosine`
+
+### 5. Seed Company Questions
+
+```bash
+cd server
+npm run seed:questions
+```
+
+### 6. Start Application
+
+```bash
+# Terminal 1: Backend
+cd server && npm run dev
+
+# Terminal 2: Frontend
+cd frontend && npm run dev
+```
+
+---
+
 ## 📊 Database Schema
 
 The application uses PostgreSQL with Prisma ORM. Key models include:
@@ -211,6 +294,39 @@ To view/edit the database visually:
 ```bash
 cd server
 npx prisma studio
+```
+
+---
+
+## 📚 API Endpoints
+
+### Resume APIs
+
+| Method | Endpoint              | Description         |
+| ------ | --------------------- | ------------------- |
+| POST   | `/api/resumes/upload` | Upload PDF resume   |
+| GET    | `/api/resumes`        | Get user's resumes  |
+| GET    | `/api/resumes/:id`    | Get specific resume |
+| DELETE | `/api/resumes/:id`    | Delete resume       |
+
+### Interview APIs
+
+| Method | Endpoint                            | Description        |
+| ------ | ----------------------------------- | ------------------ |
+| POST   | `/api/interview/generate-questions` | Generate questions |
+| GET    | `/api/interview/job-roles`          | Get job roles      |
+| GET    | `/api/interview/companies`          | Get companies      |
+
+### Example: Generate Questions
+
+```json
+POST /api/interview/generate-questions
+{
+  "resumeId": "uuid",
+  "jobRole": "Software Engineer",
+  "company": "Google",
+  "numberOfQuestions": 10
+}
 ```
 
 ---
